@@ -9,7 +9,7 @@ class_names = ['Cat','Dog']
 
 # limiar de confiança
 
-confidence_threshold = 0.7
+confidence_threshold = 0.85
 
 st.title('Classificação de Animais: 🐶🐱')
 

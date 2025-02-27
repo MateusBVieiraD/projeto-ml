@@ -3,3 +3,4 @@ tensorflow
 numpy
 scikit-learn
 pillow
+h5py==3.6.0
