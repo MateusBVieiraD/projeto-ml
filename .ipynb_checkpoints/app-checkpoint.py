@@ -16,7 +16,8 @@ st.title('Classificação de Animais: 🐶🐱')
 uploaded_file = st.file_uploader("Escolha uma imagem...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    img = Image.open((uploaded_file).convert('RGB'))
+    img = Image.open(uploaded_file)
+    img.convert('RGB')
     img = img.resize((64,64))
 
     img_array = np.array(img) / 255.0
