@@ -3,6 +3,9 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 import torch.nn as nn
+import torch.nn.functional as F
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Definir a CNN (precisa ser igual ao modelo treinado)
 class CNN(nn.Module):
@@ -24,28 +27,35 @@ class CNN(nn.Module):
         return x
 
 # Carregar o modelo treinado
-modelo = CNN()
-modelo.load_state_dict(torch.load("modelo_cachorros_gatos.pth", map_location=torch.device("cpu")))
+modelo = CNN().to(device)
+modelo.load_state_dict(torch.load("modelo_cachorros_gatos.pth", map_location= device))
 modelo.eval()
 
 transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
+    transforms.Lambda(lambda x: x.expand(3,-1,-1) if x.shape[0] == 1 else x,)
+    transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
 ])
 
-st.title("Classificador de Cachorros e Gatos 🐶🐱")
+st.title("Classificador de Cachorros e Gatos 🐶🐱:")
 
 uploaded_file = st.file_uploader("Envie uma imagem", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Imagem carregada", use_column_width=True)
 
-    image = transform(image).unsqueeze(0)  # Adiciona batch dimension
+    image = transform(image).unsqueeze(0).to(device)  # Adiciona batch dimension
 
     with torch.no_grad():
         output = modelo(image)
-        _, predicted = torch.max(output, 1)
+        probabilities = F.softmax(output, dim = 1)
+        confidence, predicted = torch.max(probabilities , 1)
         classes = ["Gato", "Cachorro"]
-        st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+
+        threshold = 0.7
+
+        if confidence.item() < threshold:
+            st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
+        st.write(f"**Classe prevista:** {classes[predicted.item()]} com {confidence.item() * 100:.2f}% de confiança")
