@@ -1,10 +1,4 @@
 import asyncio
-
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    asyncio.set_event_loop(asyncio.new_event_loop())
-
 import streamlit as st
 import torch
 import torchvision.transforms as transforms
@@ -44,26 +38,31 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
 ])
 
-st.title("Classificador de Cachorros e Gatos 🐶🐱:")
 
-uploaded_file = st.file_uploader("Envie uma imagem", type=["jpg", "png", "jpeg"])
+async def run():
+    st.title("Classificador de Cachorros e Gatos 🐶🐱:")
+    
+    uploaded_file = st.file_uploader("Envie uma imagem", type=["jpg", "png", "jpeg"])
+    
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file).convert("RGB")
+        st.image(image, caption="Imagem carregada", use_column_width=True)
+    
+        image = transform(image).unsqueeze(0).to(device)  # Adiciona batch dimension
+    
+        with torch.no_grad():
+            output = modelo(image)
+            probabilities = F.softmax(output, dim = 1)
+            confidence, predicted = torch.max(probabilities , 1)
+            classes = ["Gato", "Cachorro"]
+    
+            threshold = 0.6
+    
+            if confidence.item() < threshold:
+                st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
+            st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+    
+        torch.cuda.empty_cache()
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Imagem carregada", use_column_width=True)
-
-    image = transform(image).unsqueeze(0).to(device)  # Adiciona batch dimension
-
-    with torch.no_grad():
-        output = modelo(image)
-        probabilities = F.softmax(output, dim = 1)
-        confidence, predicted = torch.max(probabilities , 1)
-        classes = ["Gato", "Cachorro"]
-
-        threshold = 0.6
-
-        if confidence.item() < threshold:
-            st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
-        st.write(f"**Classe prevista:** {classes[predicted.item()]}")
-
-    torch.cuda.empty_cache()
+if __name__ == "__main__":
+    asyncio.run(run())
