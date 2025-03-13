@@ -65,3 +65,5 @@ if uploaded_file is not None:
         if confidence.item() < threshold:
             st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
         st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+
+    torch.cuda.empty_cache()

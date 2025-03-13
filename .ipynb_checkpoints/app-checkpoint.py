@@ -1,9 +1,3 @@
-import streamlit as st
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
-import torch.nn as nn
-import torch.nn.functional as F
 import asyncio
 
 try:
@@ -11,8 +5,14 @@ try:
 except RuntimeError:
     asyncio.set_event_loop(asyncio.new_event_loop())
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+import streamlit as st
+import torch
+import torchvision.transforms as transforms
+from PIL import Image
+import torch.nn as nn
+import torch.nn.functional as F
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Definir a CNN (precisa ser igual ao modelo treinado)
 class CNN(nn.Module):
     def __init__(self):
@@ -65,3 +65,5 @@ if uploaded_file is not None:
         if confidence.item() < threshold:
             st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
         st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+
+    torch.cuda.empty_cache()
