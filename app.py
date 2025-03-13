@@ -4,6 +4,12 @@ import torchvision.transforms as transforms
 from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
+import asyncio
+
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -54,7 +60,7 @@ if uploaded_file is not None:
         confidence, predicted = torch.max(probabilities , 1)
         classes = ["Gato", "Cachorro"]
 
-        threshold = 0.7
+        threshold = 0.6
 
         if confidence.item() < threshold:
             st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
