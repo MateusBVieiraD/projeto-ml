@@ -39,30 +39,27 @@ transform = transforms.Compose([
 ])
 
 
-async def run():
-    st.title("Classificador de Cachorros e Gatos 🐶🐱:")
+st.title("Classificador de Cachorros e Gatos 🐶🐱:")
     
-    uploaded_file = st.file_uploader("Envie uma imagem", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("Envie uma imagem", type=["jpg", "png", "jpeg"])
     
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Imagem carregada", use_column_width=True)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Imagem carregada", use_column_width=True)
     
-        image = transform(image).unsqueeze(0).to(device)  # Adiciona batch dimension
+    image = transform(image).unsqueeze(0).to(device)  # Adiciona batch dimension
     
-        with torch.no_grad():
-            output = modelo(image)
-            probabilities = F.softmax(output, dim = 1)
-            confidence, predicted = torch.max(probabilities , 1)
-            classes = ["Gato", "Cachorro"]
+    with torch.no_grad():
+        output = modelo(image)
+        probabilities = F.softmax(output, dim = 1)
+        confidence, predicted = torch.max(probabilities , 1)
+        classes = ["Gato", "Cachorro"]
     
-            threshold = 0.6
+        threshold = 0.6
     
-            if confidence.item() < threshold:
-                st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
-            st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+        if confidence.item() < threshold:
+            st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
+        st.write(f"**Classe prevista:** {classes[predicted.item()]}")
     
-        torch.cuda.empty_cache()
+    torch.cuda.empty_cache()
 
-if __name__ == "__main__":
-    asyncio.run(run())
