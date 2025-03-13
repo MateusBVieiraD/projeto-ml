@@ -1,7 +1,8 @@
+asyncio
+streamlit
 torch
 torchvision
+Pillow
 matplotlib
 numpy
 pandas
-streamlit
-Pillow
