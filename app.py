@@ -34,7 +34,7 @@ modelo.eval()
 transform = transforms.Compose([
     transforms.Resize((64, 64)),
     transforms.ToTensor(),
-    transforms.Lambda(lambda x: x.expand(3,-1,-1) if x.shape[0] == 1 else x,)
+    transforms.Lambda(lambda x: x.expand(3,-1,-1) if x.shape[0] == 1 else x,),
     transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
 ])
 
