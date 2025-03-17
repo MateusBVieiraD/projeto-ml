@@ -60,7 +60,7 @@ if uploaded_file is not None:
         sorted_prob, _ = torch.sort(probabilities, descending = True)
 
         confidence = max_prob.item()
-        diff = sorted_probs[0][0] - sorted_probs[0][1]
+        diff = sorted_prob[0][0] - sorted_prob[0][1]
         
         classes = ["Gato", "Cachorro"]
     
