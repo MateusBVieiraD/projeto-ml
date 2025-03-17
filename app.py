@@ -6,6 +6,9 @@ from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
 
+# Ajusta o loop do asyncio
+asyncio.set_event_loop(asyncio.new_event_loop())
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Definir a CNN (precisa ser igual ao modelo treinado)
 class CNN(nn.Module):
@@ -57,7 +60,7 @@ if uploaded_file is not None:
         sorted_prob, _ = torch.sort(probabilities, descending = True)
 
         confidence = max_prob.item()
-        diff = sorted_probs[0][1] - sorted_probs[0][1]
+        diff = sorted_probs[0][0] - sorted_probs[0][1]
         
         classes = ["Gato", "Cachorro"]
     
