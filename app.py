@@ -52,14 +52,21 @@ if uploaded_file is not None:
     with torch.no_grad():
         output = modelo(image)
         probabilities = F.softmax(output, dim = 1)
-        confidence, predicted = torch.max(probabilities , 1)
+        
+        max_prob, predicted = torch.max(probabilities , 1)
+        sorted_prob, _ = torch.sort(probabilities, descending = True)
+
+        confidence = max_prob.item()
+        diff = sorted_probs[0][1] - sorted_probs[0][1]
+        
         classes = ["Gato", "Cachorro"]
     
-        threshold = 0.6
+        
     
-        if confidence.item() < threshold:
+        if confidence < 0.6 or diff < 0.2:
             st.write('🔍 A imagem pode não ser um gato nem um cachorro. 🔍')
-        st.write(f"**Classe prevista:** {classes[predicted.item()]}")
+        else:    
+            st.write(f"**Classe prevista:** {classes[predicted.item()]}")
     
     torch.cuda.empty_cache()
 
